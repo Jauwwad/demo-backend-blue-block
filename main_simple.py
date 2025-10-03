@@ -18,6 +18,7 @@ from typing import List, Optional, Dict, Any
 from datetime import datetime
 import json
 import hashlib
+import os
 
 # Initialize FastAPI app
 app = FastAPI(
@@ -309,4 +310,5 @@ if __name__ == "__main__":
     print("📚 API Docs: http://localhost:8000/docs")
     print("✅ Starting server...")
     
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    port = int(os.environ.get("PORT", 8000))
+    uvicorn.run(app, host="0.0.0.0", port=port)

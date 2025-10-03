@@ -379,11 +379,11 @@ except ImportError as e:
     print(f"⚠️ NeonDB service not available: {e}")
 
 # Configuration
-PORT = 8002
+PORT = int(os.getenv('PORT', 8002))  # Use Render's PORT environment variable
 CORS_ORIGINS = ["http://localhost:3000", "http://localhost:8004", "http://localhost:8080"]
 
 # Blockchain service configuration
-BLOCKCHAIN_API_URL = "http://localhost:8003"
+BLOCKCHAIN_API_URL = os.getenv('BLOCKCHAIN_API_URL', "http://localhost:8003")
 BLOCKCHAIN_SERVICE_AVAILABLE = True
 
 def test_blockchain_connection():
@@ -394,14 +394,14 @@ def test_blockchain_connection():
     
     try:
         # Try the local blockchain service first, then fallback to remote
-        local_url = "http://localhost:8003/health"
-        remote_url = "http://localhost:8003/health"
+        local_url = f"{BLOCKCHAIN_API_URL}/health"
+        remote_url = f"{BLOCKCHAIN_API_URL}/health"
         
         try:
             response = requests.get(local_url, timeout=2)
             if response.status_code == 200:
                 BLOCKCHAIN_SERVICE_AVAILABLE = True
-                print("✅ Local blockchain service connected (localhost:8003)")
+                print(f"✅ Local blockchain service connected ({BLOCKCHAIN_API_URL})")
                 return True
         except:
             pass
@@ -425,10 +425,10 @@ def check_blockchain_service():
         # Try multiple endpoints to ensure service is working
         try:
             # Test health endpoint
-            health_response = requests.get("http://localhost:8003/health", timeout=3)
+            health_response = requests.get(f"{BLOCKCHAIN_API_URL}/health", timeout=3)
             if health_response.status_code == 200:
                 # Test blockchain status endpoint
-                status_response = requests.get("http://localhost:8003/api/blockchain/status", timeout=3)
+                status_response = requests.get(f"{BLOCKCHAIN_API_URL}/api/blockchain/status", timeout=3)
                 if status_response.status_code == 200:
                     BLOCKCHAIN_SERVICE_AVAILABLE = True
                     print("✅ Blockchain service fully available (health + status)")
@@ -439,7 +439,7 @@ def check_blockchain_service():
             
         # Fallback: try just health endpoint
         try:
-            response = requests.get("http://localhost:8003/health", timeout=5)
+            response = requests.get(f"{BLOCKCHAIN_API_URL}/health", timeout=5)
             BLOCKCHAIN_SERVICE_AVAILABLE = response.status_code == 200
             if BLOCKCHAIN_SERVICE_AVAILABLE:
                 print("✅ Blockchain service available (health only)")
@@ -510,8 +510,8 @@ def register_project_on_blockchain(project_data):
         
         # Try local blockchain service first, then fallback to remote
         blockchain_urls = [
-            "http://localhost:8003/api/blockchain/register-project",
-            "http://localhost:8003/api/blockchain/register-project"
+            f"{BLOCKCHAIN_API_URL}/api/blockchain/register-project",
+            f"{BLOCKCHAIN_API_URL}/api/blockchain/register-project"
         ]
         
         for url in blockchain_urls:
@@ -3632,8 +3632,8 @@ def main():
     init_demo_users()
     
     try:
-        with ThreadedTCPServer(("", PORT), ProductionAPIHandler) as httpd:
-            print(f"✅ Production server running at http://localhost:{PORT}")
+        with ThreadedTCPServer(("0.0.0.0", PORT), ProductionAPIHandler) as httpd:
+            print(f"✅ Production server running at http://0.0.0.0:{PORT}")
             print("🔧 Available endpoints:")
             print("   • GET  /api/status")
             print("   • GET  /api/projects")
