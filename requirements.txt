@@ -1,14 +1,10 @@
-# Essential dependencies for production server
-Flask==2.3.3
-python-dotenv==1.0.0
-requests==2.31.0
-psycopg2-binary==2.9.7
-reportlab==4.0.4
+# Core dependencies for production server
+Flask
+python-dotenv
+requests
 
-# FastAPI dependencies (if using FastAPI endpoints)
-fastapi==0.104.1
-uvicorn[standard]==0.24.0
-pydantic[email]==2.4.2
+# Database (try without version constraints)
+psycopg2-binary
 
-# Additional utilities
-python-dateutil==2.8.2
+# Optional dependencies that might be needed
+python-dateutil
